@@ -1,12 +1,11 @@
 <?php
 // Kết nối cơ sở dữ liệu
-$mysqli = new mysqli("localhost", "root", "", "test1",3300);
+$mysqli = new mysqli("localhost", "root", "", "test1", 3300);
 
 // Kiểm tra kết nối
 if ($mysqli->connect_error) {
     die("Connection failed: " . $mysqli->connect_error);
 }
-
 
 // Lấy danh sách sinh viên
 $sql = "SELECT * FROM SinhVien";
@@ -17,100 +16,67 @@ $result = $mysqli->query($sql);
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Trang Sinh Viên</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh Sách Sinh Viên</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #f8f9fa;
         }
-
-        table {
-            width: 80%;
-            margin: 20px auto;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: center;
-            border: 1px solid #ddd;
-        }
-
-        th {
-            background-color: #f4f4f4;
-        }
-
-        .btn-register, .btn-login, .btn-hocphan {
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            color: white;
-            margin: 0 10px;
-            display: inline-block;
-        }
-
-        .btn-register {
-            background-color: #28a745;
-        }
-
-        .btn-register:hover {
-            background-color: #218838;
-        }
-
-        .btn-login {
-            background-color: #007bff;
-        }
-
-        .btn-login:hover {
-            background-color: #0056b3;
-        }
-
-        .btn-hocphan {
-            background-color: #17a2b8;
-        }
-
-        .btn-hocphan:hover {
-            background-color: #138496;
+        .table img {
+            border-radius: 50%;
         }
     </style>
 </head>
 <body>
+    <div class="container mt-4">
+        <h2 class="text-center mb-4">Danh Sách Sinh Viên</h2>
+        
+        <div class="d-flex justify-content-between mb-3">
+            <div>
+                <a href="add_student.php" class="btn btn-success">Thêm Sinh Viên</a>
+                <a href="hocphan.php" class="btn btn-info">Học Phần</a>
+            </div>
+            <div>
+                <a href="register.php" class="btn btn-primary">Đăng Ký</a>
+                <a href="login.php" class="btn btn-secondary">Đăng Nhập</a>
+            </div>
+        </div>
 
-    <h1 style="text-align:center;">Danh Sách Sinh Viên</h1>
-
-    <div style="text-align: center; margin-bottom: 20px;">
-        <a href="add_student.php" class="btn-register">Add Student</a> 
-        <a href="hocphan.php" class="btn-hocphan">Học Phần</a> <!-- Thêm nút Học Phần -->
-        <a href="register.php" class="btn-register">Đăng Ký</a> <!-- Thêm nút Đăng Ký -->
-        <a href="login.php" class="btn-login">Đăng Nhập</a> <!-- Thêm nút Đăng Nhập -->
+        <table class="table table-bordered table-hover text-center">
+            <thead class="table-dark">
+                <tr>
+                    <th>Mã SV</th>
+                    <th>Họ Tên</th>
+                    <th>Giới Tính</th>
+                    <th>Ngày Sinh</th>
+                    <th>Hình Ảnh</th>
+                    <th>Mã Ngành</th>
+                    <th>Hành Động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($row = $result->fetch_assoc()): ?>
+                    <tr>
+                        <td><?php echo $row['MaSV']; ?></td>
+                        <td><?php echo $row['HoTen']; ?></td>
+                        <td><?php echo $row['GioiTinh']; ?></td>
+                        <td><?php echo $row['NgaySinh']; ?></td>
+                        <td>
+                            <img src="data:image/jpeg;base64,<?php echo base64_encode($row['Hinh']); ?>" width="50" height="50">
+                        </td>
+                        <td><?php echo $row['MaNganh']; ?></td>
+                        <td>
+                            <a href="edit_student.php?id=<?php echo $row['MaSV']; ?>" class="btn btn-warning btn-sm">Sửa</a>
+                            <a href="details_student.php?id=<?php echo $row['MaSV']; ?>" class="btn btn-info btn-sm">Chi Tiết</a>
+                            <a href="delete_student.php?id=<?php echo $row['MaSV']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</a>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
     </div>
-
-    <table>
-        <tr>
-            <th>MaSV</th>
-            <th>HoTen</th>
-            <th>GioiTinh</th>
-            <th>NgaySinh</th>
-            <th>Hinh</th>
-            <th>MaNganh</th>
-            <th>Actions</th>
-        </tr>
-        <?php while ($row = $result->fetch_assoc()): ?>
-            <tr>
-                <td><?php echo $row['MaSV']; ?></td>
-                <td><?php echo $row['HoTen']; ?></td>
-                <td><?php echo $row['GioiTinh']; ?></td>
-                <td><?php echo $row['NgaySinh']; ?></td>
-                <td><img src="data:image/jpeg;base64,<?php echo base64_encode($row['Hinh']); ?>" width="50" height="50"></td>
-                <td><?php echo $row['MaNganh']; ?></td>
-                <td>
-                    <a href="edit_student.php?id=<?php echo $row['MaSV']; ?>">Edit</a> |
-                    <a href="details_student.php?id=<?php echo $row['MaSV']; ?>">Details</a> |<a href="delete_student.php?id=<?php echo $row['MaSV']; ?>" onclick="return confirm('Are you sure you want to delete this student?')">Delete</a>
-                </td>
-            </tr>
-        <?php endwhile; ?>
-    </table>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 
