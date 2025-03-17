@@ -1,6 +1,6 @@
 <?php
 // Kết nối cơ sở dữ liệu
-$mysqli = new mysqli("localhost", "root", "", "test1",3300);
+$mysqli = new mysqli("localhost", "root", "", "testt");  // Đảm bảo đúng tên cơ sở dữ liệu
 
 // Kiểm tra kết nối
 if ($mysqli->connect_error) {
@@ -14,35 +14,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $gioiTinh = $_POST['GioiTinh'];
     $ngaySinh = $_POST['NgaySinh'];
     $maNganh = $_POST['MaNganh'];
-
-    // Kiểm tra nếu có tệp hình ảnh
-    if ($_FILES['Hinh']['error'] == 0) {
-        $hinh = addslashes(file_get_contents($_FILES['Hinh']['tmp_name']));
-    } else {
-        $hinh = null; // Nếu không có ảnh, lưu NULL
-    }
-
-    // Kết nối cơ sở dữ liệu
-    $mysqli = new mysqli("localhost", "root", "", "test1", 3300);
-    
-    if ($mysqli->connect_error) {
-        die("Kết nối thất bại: " . $mysqli->connect_error);
-    }
+    $hinh = addslashes(file_get_contents($_FILES['Hinh']['tmp_name']));  // Đọc tệp hình ảnh
 
     // Chèn sinh viên vào cơ sở dữ liệu
     $sql = "INSERT INTO SinhVien (MaSV, HoTen, GioiTinh, NgaySinh, Hinh, MaNganh) 
-            VALUES (?, ?, ?, ?, ?, ?)";
-
-    $stmt = $mysqli->prepare($sql);
-    $stmt->bind_param("sssssb", $maSV, $hoTen, $gioiTinh, $ngaySinh, $hinh, $maNganh);
-
-    if ($stmt->execute()) {
-        echo "<div class='alert alert-success text-center'>Thêm sinh viên thành công!</div>";
+            VALUES ('$maSV', '$hoTen', '$gioiTinh', '$ngaySinh', '$hinh', '$maNganh')";
+    if ($mysqli->query($sql) === TRUE) {
+        echo "<script>alert('Thêm sinh viên thành công!'); window.location.href='index.php';</script>";
     } else {
-        echo "<div class='alert alert-danger text-center'>Lỗi: " . $stmt->error . "</div>";
+        echo "Lỗi: " . $mysqli->error;
     }
 
-    $stmt->close();
     $mysqli->close();
 }
 ?>
@@ -51,50 +33,101 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thêm Sinh Viên</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 50%;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        input[type="text"], input[type="date"], input[type="file"] {
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h2 class="text-center">Thêm Sinh Viên</h2>
-        <form method="POST" enctype="multipart/form-data" class="p-4 border rounded shadow bg-light">
-            <div class="mb-3">
-                <label for="MaSV" class="form-label">Mã Sinh Viên:</label>
-                <input type="text" id="MaSV" name="MaSV" class="form-control" required>
-            </div>
 
-            <div class="mb-3">
-                <label for="HoTen" class="form-label">Họ Tên:</label>
-                <input type="text" id="HoTen" name="HoTen" class="form-control" required>
-            </div>
+    <div class="container">
+        <h1>Thêm Sinh Viên</h1>
+        <form method="POST" enctype="multipart/form-data">
+            <label for="MaSV">Mã Sinh Viên:</label>
+            <input type="text" id="MaSV" name="MaSV" required>
+            <label for="HoTen">Họ Tên:</label>
+            <input type="text" id="HoTen" name="HoTen" required>
 
-            <div class="mb-3">
-                <label for="GioiTinh" class="form-label">Giới Tính:</label>
-                <select id="GioiTinh" name="GioiTinh" class="form-control">
-                    <option value="Nam">Nam</option>
-                    <option value="Nữ">Nữ</option>
-                </select>
-            </div>
+            <label for="GioiTinh">Giới Tính:</label>
+            <input type="text" id="GioiTinh" name="GioiTinh" required>
 
-            <div class="mb-3">
-                <label for="NgaySinh" class="form-label">Ngày Sinh:</label>
-                <input type="date" id="NgaySinh" name="NgaySinh" class="form-control" required>
-            </div>
+            <label for="NgaySinh">Ngày Sinh:</label>
+            <input type="date" id="NgaySinh" name="NgaySinh" required>
 
-            <div class="mb-3">
-                <label for="Hinh" class="form-label">Hình Ảnh:</label>
-                <input type="file" id="Hinh" name="Hinh" class="form-control" required>
-            </div>
+            <label for="Hinh">Hình Ảnh:</label>
+            <input type="file" id="Hinh" name="Hinh" required>
 
-            <div class="mb-3">
-                <label for="MaNganh" class="form-label">Mã Ngành:</label>
-                <input type="text" id="MaNganh" name="MaNganh" class="form-control" required>
-            </div>
+            <label for="MaNganh">Mã Ngành:</label>
+            <input type="text" id="MaNganh" name="MaNganh" required>
 
-            <button type="submit" class="btn btn-primary w-100">Thêm</button>
+            <button type="submit">Thêm</button>
         </form>
+        <a href="index.php" class="back-link">Quay lại trang danh sách sinh viên</a>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
