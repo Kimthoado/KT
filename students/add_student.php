@@ -1,6 +1,6 @@
 <?php
 // Kết nối cơ sở dữ liệu
-$mysqli = new mysqli("localhost", "root", "", "testt");  // Đảm bảo đúng tên cơ sở dữ liệu
+$mysqli = new mysqli("localhost", "root", "", "test1",3300);  // Đảm bảo đúng tên cơ sở dữ liệu
 
 // Kiểm tra kết nối
 if ($mysqli->connect_error) {
