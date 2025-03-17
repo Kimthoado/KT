@@ -1,18 +1,17 @@
 <?php
+// Kết nối database
 $mysqli = new mysqli("localhost", "root", "", "test1", 3300);
-if ($mysqli->connect_error) {
-    die("Connection failed: " . $mysqli->connect_error);
-}
 
 if (isset($_GET['id'])) {
-    $id = $_GET['id'];
-    $sql = "DELETE FROM DangKyHocPhan WHERE ID = $id";
-    if ($mysqli->query($sql) === TRUE) {
-        header("Location: dangkyhocphan.php");
+    $id = $_GET['id']; // Lấy ID học phần cần xóa
+    $sql = "DELETE FROM hocphan WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id);
+    
+    if ($stmt->execute()) {
+        header("Location: hocphan.php"); // Chuyển hướng về trang học phần sau khi xóa
     } else {
-        echo "Lỗi: " . $mysqli->error;
+        echo "Lỗi: " . $conn->error;
     }
 }
-
-$mysqli->close();
 ?>
